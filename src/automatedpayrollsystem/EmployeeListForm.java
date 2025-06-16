@@ -22,7 +22,7 @@ public class EmployeeListForm extends javax.swing.JFrame {
 
         // Load employee data from CSV
         try {
-            EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
+            EmployeeDataLoader loader = new EmployeeDataLoader();
             // Do something with the data, e.g., show in JTable
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,

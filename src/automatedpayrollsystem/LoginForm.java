@@ -4,6 +4,9 @@
  */
 package automatedpayrollsystem;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 import java.util.List;
 
@@ -21,7 +24,7 @@ public class LoginForm extends javax.swing.JFrame {
         setLocationRelativeTo(null); // This centers the window
     // Check if CSV file loaded properly
     try {
-        EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
+        EmployeeDataLoader loader = new EmployeeDataLoader();
         if (loader.getAllEmployees().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A CSV loaded but no employee data found.",
                 "CSV File Check", JOptionPane.WARNING_MESSAGE);
@@ -49,8 +52,8 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         JUsernameTextField = new javax.swing.JTextField();
         rolecombobox = new javax.swing.JComboBox<>();
-        Cancel = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jCancelButton = new javax.swing.JButton();
+        jLoginButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -88,25 +91,25 @@ public class LoginForm extends javax.swing.JFrame {
         rolecombobox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HR Personnel", "Team Leader", "Payroll Manager", "Accounting Head", "Regular Employee" }));
         getContentPane().add(rolecombobox, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 180, -1));
 
-        Cancel.setBackground(new java.awt.Color(0, 172, 238));
-        Cancel.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        Cancel.setText("Cancel");
-        Cancel.addActionListener(new java.awt.event.ActionListener() {
+        jCancelButton.setBackground(new java.awt.Color(0, 172, 238));
+        jCancelButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jCancelButton.setText("Cancel");
+        jCancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CancelActionPerformed(evt);
+                jCancelButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(Cancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 290, 122, -1));
+        getContentPane().add(jCancelButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 290, 122, -1));
 
-        jButton3.setBackground(new java.awt.Color(0, 172, 238));
-        jButton3.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jButton3.setText("Login");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jLoginButton.setBackground(new java.awt.Color(0, 172, 238));
+        jLoginButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jLoginButton.setText("Login");
+        jLoginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jLoginButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 290, 110, -1));
+        getContentPane().add(jLoginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 290, 110, -1));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 204));
         jPanel1.setPreferredSize(new java.awt.Dimension(800, 100));
@@ -148,39 +151,61 @@ public class LoginForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_ForgotPasswordorUsernameMouseClickMouseClicked
 
-    private void CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelActionPerformed
+    private void jCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCancelButtonActionPerformed
     System.exit(0); // closes the application
-    }//GEN-LAST:event_CancelActionPerformed
+    }//GEN-LAST:event_jCancelButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-    String username = JUsernameTextField.getText().trim();
+    private void jLoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoginButtonActionPerformed
+   String username = JUsernameTextField.getText().trim();
     String password = new String(jPasswordField.getPassword()).trim();
-    String role = rolecombobox.getSelectedItem().toString().trim();
+    String selectedRole = rolecombobox.getSelectedItem().toString().trim();
 
-    EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
-    List<Employee> allEmployees = loader.getAllEmployees();
+    try (BufferedReader br = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"))) {
+        String line;
+        boolean found = false;
 
-    boolean found = false;
-    for (Employee emp : allEmployees) {
-        if (emp.username.equals(username) && emp.password.equals(password) && emp.role.equalsIgnoreCase(role)) {
-            found = true;
-            JOptionPane.showMessageDialog(this, "✅ Login successful as " + role);
-            
-            // Example: open HRDashboard
-            if (role.equalsIgnoreCase("HR Personnel") || role.equalsIgnoreCase("Payroll Manager")) {
-                new HRDashboard().setVisible(true);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "🔒 Role recognized but no dashboard implemented.");
+        // Skip header
+        br.readLine(); 
+
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",", -1); // -1 to avoid ignoring empty columns
+
+            if (parts.length < 21) continue; // Ensure correct column length
+
+            String filePassword = parts[19].trim(); // Column 20
+            String fileUsername = parts[20].trim(); // Column 21
+            String position = parts[11].trim();     // Column 12
+
+            if (fileUsername.equals(username) && filePassword.equals(password)) {
+                // Now validate the role
+                if (selectedRole.equalsIgnoreCase("HR Personnel")) {
+                    if (position.equalsIgnoreCase("HR Manager") ||
+                        position.equalsIgnoreCase("HR Team Leader") ||
+                        position.equalsIgnoreCase("HR Rank and File")) {
+                        found = true;
+                        JOptionPane.showMessageDialog(this, "✅ Login successful as HR Personnel (" + position + ")");
+                        new HRDashboard().setVisible(true); // replace with your own class
+                        this.dispose();
+                        break;
+                    }
+                } else if (selectedRole.equalsIgnoreCase("Payroll Manager") && position.equalsIgnoreCase("Payroll Manager")) {
+                    found = true;
+                    JOptionPane.showMessageDialog(this, "✅ Login successful as Payroll Manager");
+                    new PayrollManagerDashboard().setVisible(true); // replace with your own class
+                    this.dispose();
+                    break;
+                }
             }
-            break;
         }
-    }
 
-    if (!found) {
-        JOptionPane.showMessageDialog(this, "❌ Invalid username, password, or role.");
+        if (!found) {
+            JOptionPane.showMessageDialog(this, "❌ Invalid username, password, or role/position.");
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "❌ Error reading file: " + e.getMessage());
+        e.printStackTrace();
     }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_jLoginButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -218,17 +243,17 @@ public class LoginForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Cancel;
     private javax.swing.JLabel ForgotPasswordorUsernameMouseClick;
     private javax.swing.JTextField JUsernameTextField;
     private javax.swing.JMenuBar Login;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jCancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JButton jLoginButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField;
     private javax.swing.JComboBox<String> rolecombobox;

@@ -9,19 +9,17 @@ package automatedpayrollsystem;
  * @author Jomax
  */
 public class Employee {
-    public String employeeNumber;
-    public String username;
-    public String password;
-    public String role;
-    public String firstName;
-    public String lastName;
+    private String username;
+    private String password;
+    private String name;
 
-    public Employee(String employeeNumber, String username, String password, String role, String firstName, String lastName) {
-        this.employeeNumber = employeeNumber;
+    public Employee(String username, String password, String name) {
         this.username = username;
         this.password = password;
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
     }
+
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getName() { return name; }
 }
