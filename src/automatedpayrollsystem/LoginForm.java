@@ -5,6 +5,10 @@
 package automatedpayrollsystem;
 
 import automatedpayrollsystem.EmployeeDataLoader;
+import automatedpayrollsystem.HRDashboard;
+import automatedpayrollsystem.ManageEmployeeForm;
+import automatedpayrollsystem.PayrollManagerDashboard;
+import automatedpayrollsystem.RankandFileDashboard;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -152,7 +156,7 @@ public class LoginForm extends javax.swing.JFrame {
         jTextArea.setRows(5);
         jScrollPane1.setViewportView(jTextArea);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 120, 300, 250));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 370, 360, 50));
         setJMenuBar(Login);
 
         pack();
@@ -171,40 +175,59 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jCancelButtonActionPerformed
 
     private void jLoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoginButtonActionPerformed
-    if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"));
-            String line;
-            StringBuilder result = new StringBuilder();
+if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
+    try {
+        BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"));
+        String line;
+        boolean found = false;
 
-            // Skip header
-            reader.readLine();
+        // Skip header
+        reader.readLine();
 
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",", -1); // -1 = include empty values
+        while ((line = reader.readLine()) != null) {
+            String[] data = line.split(",", -1); // -1 to include empty fields
 
-                if (data.length < 17) continue;
+            if (data.length < 17) continue;
 
-                String position = data[10].trim();
+            String username = JUsernameTextField.getText().trim();
+            String password = jPasswordField.getText().trim();
+            String selectedRole = rolecombobox.getSelectedItem().toString();
 
-                if (position.equals("HR Manager") || 
-                    position.equals("HR Team Leader") || 
-                    position.equals("HR Rank and File")) {
+            String fileUsername = data[15].trim();  // Assuming column 2 = Username
+            String filePassword = data[16].trim();  // Assuming column 3 = Password
+            String filePosition = data[10].trim(); // Assuming column 11 = Position
 
-                    result.append("Name: ").append(data[1].trim())  // Assuming column 2 = Name
-                          .append(" | Position: ").append(position)
-                          .append("\n");
-                }
+            boolean isHRMatch = selectedRole.equals("HR Personnel") &&
+                                (filePosition.equals("HR Manager") ||
+                                 filePosition.equals("HR Team Leader") ||
+                                 filePosition.equals("HR Rank and File"));
+
+            if ((isHRMatch || selectedRole.equals(filePosition)) &&
+                username.equals(fileUsername) &&
+                password.equals(filePassword)) {
+
+                found = true;
+                JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // OPEN HRDashboard
+                HRDashboard hr = new HRDashboard(username);
+                hr.setVisible(true);
+                this.setVisible(false);
+                break;
             }
-
-            reader.close();
-            jTextArea.setText(result.toString());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            jTextArea.setText("Error reading file: " + e.getMessage());
         }
+
+        reader.close();
+
+        if (!found) {
+            JOptionPane.showMessageDialog(this, "Invalid login credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
     }//GEN-LAST:event_jLoginButtonActionPerformed
 
     /**
