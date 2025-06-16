@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import java.io.File;
 
 /**
  *
@@ -175,9 +176,14 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jCancelButtonActionPerformed
 
     private void jLoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoginButtonActionPerformed
+File file = new File("MotorPH_Employee_Data2.csv");
+System.out.println("File exists: " + file.exists());
+System.out.println("Absolute path: " + file.getAbsolutePath());
+
+        
 if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
     try {
-        BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"));
+        BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data.csv"));
         String line;
         boolean found = false;
 
@@ -187,22 +193,30 @@ if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
         while ((line = reader.readLine()) != null) {
             String[] data = line.split(",", -1); // -1 to include empty fields
 
-            if (data.length < 17) continue;
+            if (data.length < 21) continue;
 
             String username = JUsernameTextField.getText().trim();
             String password = jPasswordField.getText().trim();
             String selectedRole = rolecombobox.getSelectedItem().toString();
 
-            String fileUsername = data[15].trim();  // Assuming column 2 = Username
-            String filePassword = data[16].trim();  // Assuming column 3 = Password
-            String filePosition = data[10].trim(); // Assuming column 11 = Position
+            String fileUsername = data[20].trim().replace("\"", "");
+            String filePassword = data[19].trim().replace("\"", "");
+            String fileRole = data[13].trim().replace("\"", "");
+            
+                    System.out.println("Trying to match:");
+                    System.out.println("Input Username: [" + username + "]");
+                    System.out.println("File Username: [" + fileUsername + "]");
+                    System.out.println("Input Password: [" + password + "]");
+                    System.out.println("File Password: [" + filePassword + "]");
+                    System.out.println("Input Role: [" + selectedRole + "]");
+                    System.out.println("File Role: [" + fileRole + "]");
 
             boolean isHRMatch = selectedRole.equals("HR Personnel") &&
-                                (filePosition.equals("HR Manager") ||
-                                 filePosition.equals("HR Team Leader") ||
-                                 filePosition.equals("HR Rank and File"));
+                                (fileRole.equals("HR Manager") ||
+                                 fileRole.equals("HR Team Leader") ||
+                                 fileRole.equals("HR Rank and File"));
 
-            if ((isHRMatch || selectedRole.equals(filePosition)) &&
+            if ((isHRMatch || selectedRole.equals(fileRole)) &&
                 username.equals(fileUsername) &&
                 password.equals(filePassword)) {
 

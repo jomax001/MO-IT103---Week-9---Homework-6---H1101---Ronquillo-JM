@@ -16,9 +16,12 @@ public class HRDashboard extends javax.swing.JFrame {
     /**
      * Creates new form HRDashboard
      */
+    private String username;
+    
     public HRDashboard(String username) {        
             initComponents();
             setLocationRelativeTo(null);
+            this.username = username;
             jWelcomelabel.setText("Welcome, " + username); // <-- display username here
 
     }

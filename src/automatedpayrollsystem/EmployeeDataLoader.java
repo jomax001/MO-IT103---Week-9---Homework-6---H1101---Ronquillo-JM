@@ -23,7 +23,7 @@ public class EmployeeDataLoader {
 
     private void loadEmployeeData() {
         try {
-            InputStream input = getClass().getClassLoader().getResourceAsStream("automatedpayrollsystem/MotorPH_Employee_Data2.csv");
+            InputStream input = getClass().getClassLoader().getResourceAsStream("automatedpayrollsystem/MotorPH_Employee_Data.csv");
             if (input == null) {
                 JOptionPane.showMessageDialog(null, "❌ CSV file not found inside resources!");
                 return;
