@@ -11,40 +11,41 @@ package automatedpayrollsystem;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 public class EmployeeDataLoader {
+    private List<Employee> employees;
 
-    private List<Employee> employees = new ArrayList<>();
-
-    public EmployeeDataLoader() throws FileNotFoundException {
-        InputStream input = getClass().getClassLoader().getResourceAsStream("MotorPH_Employee_Data2.csv");
-if (input == null) {
-    throw new FileNotFoundException("Resource not found: MotorPH_Employee_Data2.csv");
-}
-
-try (BufferedReader br = new BufferedReader(new InputStreamReader(input))) {
-    String line;
-    boolean firstLine = true;
-
-    while ((line = br.readLine()) != null) {
-        if (firstLine) {
-            firstLine = false;
-            continue;
-        }
-
-        String[] values = line.split(",");
-        if (values.length >= 3) {
-            String username = values[0].trim();
-            String password = values[1].trim();
-            String name = values[2].trim();
-
-            employees.add(new Employee(username, password, name));
-        }
+    public EmployeeDataLoader() {
+        employees = new ArrayList<>();
+        loadEmployeeData();
     }
-} catch (Exception e) {
-    JOptionPane.showMessageDialog(null, "⚠ Error loading employee data: " + e.getMessage(), "CSV Load Error", JOptionPane.ERROR_MESSAGE);
-}
+
+    private void loadEmployeeData() {
+        try {
+            InputStream input = getClass().getClassLoader().getResourceAsStream("automatedpayrollsystem/MotorPH_Employee_Data2.csv");
+            if (input == null) {
+                JOptionPane.showMessageDialog(null, "❌ CSV file not found inside resources!");
+                return;
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                if (values.length >= 3) {
+                    String username = values[0].trim();
+                    String password = values[1].trim();
+                    String name = values[2].trim();
+                    employees.add(new Employee(username, password, name));
+                }
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "❌ Error loading employee data: " + e.getMessage());
+        }
     }
 
     public List<Employee> getAllEmployees() {

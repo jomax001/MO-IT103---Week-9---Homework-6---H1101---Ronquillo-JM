@@ -174,7 +174,7 @@ public class LoginForm extends javax.swing.JFrame {
 
             String filePassword = parts[19].trim(); // Column 20
             String fileUsername = parts[20].trim(); // Column 21
-            String position = parts[11].trim();     // Column 12
+            String position = parts[12].trim();     // Column 12
 
             if (fileUsername.equals(username) && filePassword.equals(password)) {
                 // Now validate the role
