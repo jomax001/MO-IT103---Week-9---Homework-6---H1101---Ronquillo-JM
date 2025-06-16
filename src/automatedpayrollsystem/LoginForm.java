@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.management.relation.Role;
-
+import java.util.List;
 
 /**
  *
@@ -24,14 +24,18 @@ public class LoginForm extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null); // This centers the window
 
-        // Check if connected to database
-        Connection conn = DBConnection.getConnection();
-        if (conn != null) {
-            JOptionPane.showMessageDialog(this, "✅ Successfully connected to the database!", "Database Connection", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "❌ Failed to connect to the database!", "Database Connection Error", JOptionPane.ERROR_MESSAGE);
-        }
+        // Check if CSV file loaded properly
+try {
+    EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
+    if (loader.getAllEmployees().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "⚠️ CSV loaded but no employee data found.", "CSV File Check", JOptionPane.WARNING_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this, "✅ Successfully loaded employee data from CSV!", "CSV File Check", JOptionPane.INFORMATION_MESSAGE);
     }
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(this, "❌ Failed to load CSV file:\n" + e.getMessage(), "CSV File Error", JOptionPane.ERROR_MESSAGE);
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -45,7 +49,7 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        JUsernameField = new javax.swing.JTextField();
+        JUsernameTextField = new javax.swing.JTextField();
         rolecombobox = new javax.swing.JComboBox<>();
         Cancel = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -53,7 +57,7 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        ForgotPasswordorUsernameMouseClick = new javax.swing.JLabel();
         jPasswordField = new javax.swing.JPasswordField();
         Login = new javax.swing.JMenuBar();
 
@@ -74,12 +78,12 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel5.setText("Select Position:");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 240, 140, -1));
 
-        JUsernameField.addActionListener(new java.awt.event.ActionListener() {
+        JUsernameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JUsernameFieldActionPerformed(evt);
+                JUsernameTextFieldActionPerformed(evt);
             }
         });
-        getContentPane().add(JUsernameField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, 180, -1));
+        getContentPane().add(JUsernameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, 180, -1));
 
         rolecombobox.setBackground(new java.awt.Color(0, 172, 238));
         rolecombobox.setFont(new java.awt.Font("Impact", 0, 16)); // NOI18N
@@ -124,70 +128,60 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel6.setText("Please enter your username and password\t");
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, 330, -1));
 
-        jLabel7.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel7.setText("Forgot Password or Username");
-        jLabel7.addMouseListener(new java.awt.event.MouseAdapter() {
+        ForgotPasswordorUsernameMouseClick.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        ForgotPasswordorUsernameMouseClick.setText("Forgot Password or Username");
+        ForgotPasswordorUsernameMouseClick.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel7MouseClicked(evt);
+                ForgotPasswordorUsernameMouseClickMouseClicked(evt);
             }
         });
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, -1, -1));
+        getContentPane().add(ForgotPasswordorUsernameMouseClick, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, -1, -1));
         getContentPane().add(jPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 200, 180, -1));
         setJMenuBar(Login);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void JUsernameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JUsernameFieldActionPerformed
+    private void JUsernameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JUsernameTextFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_JUsernameFieldActionPerformed
+    }//GEN-LAST:event_JUsernameTextFieldActionPerformed
 
-    private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
+    private void ForgotPasswordorUsernameMouseClickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ForgotPasswordorUsernameMouseClickMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_jLabel7MouseClicked
+    }//GEN-LAST:event_ForgotPasswordorUsernameMouseClickMouseClicked
 
     private void CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelActionPerformed
-        // TODO add your handling code here:
+    System.exit(0); // closes the application
     }//GEN-LAST:event_CancelActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-String username = JUsernameField.getText();
-String password = new String(jPasswordField.getPassword());
-String role = rolecombobox.getSelectedItem().toString();
+    String username = JUsernameTextField.getText().trim();
+    String password = new String(jPasswordField.getPassword()).trim();
+    String role = rolecombobox.getSelectedItem().toString().trim();
 
-try (Connection conn = DBConnection.getConnection()) {
-    String query = "SELECT * FROM users WHERE username = ? AND password = ? AND role = ?";
-    PreparedStatement stmt = conn.prepareStatement(query);
-    stmt.setString(1, username);
-    stmt.setString(2, password);
-    stmt.setString(3, role);
+    EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
+    List<Employee> allEmployees = loader.getAllEmployees();
 
-    ResultSet rs = stmt.executeQuery();
-    
-    if (rs.next()) {
-    role = rs.getString("role");
-
-    JOptionPane.showMessageDialog(this, "Login successful as " + role);
-
-    // Call corrrect dashboard base sa role
-    if (role.equalsIgnoreCase("HR Personnel")) {
-        new HRDashboard().setVisible(true);
-        this.dispose(); // isara ang login form
+    boolean found = false;
+    for (Employee emp : allEmployees) {
+        if (emp.username.equals(username) && emp.password.equals(password) && emp.role.equalsIgnoreCase(role)) {
+            found = true;
+            JOptionPane.showMessageDialog(this, "✅ Login successful as " + role);
+            
+            // Example: open HRDashboard
+            if (role.equalsIgnoreCase("HR Personnel") || role.equalsIgnoreCase("Payroll Manager")) {
+                new HRDashboard().setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "🔒 Role recognized but no dashboard implemented.");
+            }
+            break;
+        }
     }
-    // Pwede mo rin dagdagan ito para sa ibang roles:
-    else if (role.equalsIgnoreCase("Payroll Manager")) {
-        new HRDashboard().setVisible(true);
-        this.dispose();
+
+    if (!found) {
+        JOptionPane.showMessageDialog(this, "❌ Invalid username, password, or role.");
     }
-} else {
-    JOptionPane.showMessageDialog(this, "Invalid username or password");
-}
-
-
-} catch (Exception e) {
-    e.printStackTrace();
-    JOptionPane.showMessageDialog(null, "Connection error: " + e.getMessage());
-}
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
@@ -227,7 +221,8 @@ try (Connection conn = DBConnection.getConnection()) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Cancel;
-    private javax.swing.JTextField JUsernameField;
+    private javax.swing.JLabel ForgotPasswordorUsernameMouseClick;
+    private javax.swing.JTextField JUsernameTextField;
     private javax.swing.JMenuBar Login;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
@@ -236,9 +231,12 @@ try (Connection conn = DBConnection.getConnection()) {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField;
     private javax.swing.JComboBox<String> rolecombobox;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponents() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
