@@ -4,68 +4,67 @@
  */
 package automatedpayrollsystem;
 
-import java.sql.Connection;
-import automatedpayrollsystem.DBConnection;
-import javax.swing.JOptionPane;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.awt.*;
-import java.awt.event.*;
-
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.*;
+import java.util.*;
 /**
  *
  * @author Jomax
  */
 public class ManageEmployeeForm extends javax.swing.JFrame {
 
+    private final String FILE_PATH = "employees.csv";
     private String[] lastDeletedEmployee = null;
-    private Connection conn;
 
-    /**
-     * Creates new form ManageEmployeeForm
-     */
     public ManageEmployeeForm() {
-    initComponents();
-    setLocationRelativeTo(null);
-
-    // Database connection test
-    this.conn = DBConnection.getConnection();
-    if (conn != null) {
-        System.out.println("Connected to PostgreSQL successfully!");
-    } else {
-        System.out.println("Connection failed.");
+        initComponents();
+        setLocationRelativeTo(null);
+        loadEmployees();
     }
-    loadEmployees(); // <- This is correct here
-}
-private void loadEmployees() {
-    try {
-        this.conn = DBConnection.getConnection();
-        String sql = "SELECT * FROM employees";
-        PreparedStatement pst = conn.prepareStatement(sql);
-        java.sql.ResultSet rs = pst.executeQuery();
 
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0); // Clear table first
+    private void loadEmployees() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
 
-        while (rs.next()) {
-            Object[] row = {
-                rs.getString("id"),
-                rs.getString("name"),
-                rs.getString("position"),
-                rs.getString("department"),
-                rs.getDouble("salary"),
-                rs.getString("email")
-            };
-            model.addRow(row);
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            br.readLine(); // skip header
+            while ((line = br.readLine()) != null) {
+                String[] row = line.split(",");
+                if (row.length == 6) {
+                    model.addRow(row);
+                }
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to load employees: " + e.getMessage());
         }
-
-        rs.close();
-        pst.close();
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Failed to load employees.");
     }
-}
+
+private void saveAllEmployees(List<String[]> employees) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_PATH))) {
+            pw.println("id,name,position,department,salary,email");
+            for (String[] emp : employees) {
+                pw.println(String.join(",", emp));
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to save: " + e.getMessage());
+        }
+    }
+
+    private List<String[]> getAllEmployees() {
+        List<String[]> employees = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            br.readLine(); // skip header
+            while ((line = br.readLine()) != null) {
+                employees.add(line.split(","));
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Failed to read employees: " + e.getMessage());
+        }
+        return employees;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -198,140 +197,92 @@ private void loadEmployees() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UmdoDeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UmdoDeleteButtonActionPerformed
-    if (lastDeletedEmployee == null) {
-        JOptionPane.showMessageDialog(this, "No recently deleted record to undo.");
-        return;
-    }
+        if (lastDeletedEmployee == null) {
+            JOptionPane.showMessageDialog(this, "No deleted record to restore.");
+            return;
+        }
 
-    try {
-        this.conn = DBConnection.getConnection();
-        String sql = "INSERT INTO employees (id, name, position, department, salary, email) VALUES (?, ?, ?, ?, ?, ?)";
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setInt(1, Integer.parseInt(lastDeletedEmployee[0]));
-        pst.setString(2, lastDeletedEmployee[1]);
-        pst.setString(3, lastDeletedEmployee[2]);
-        pst.setString(4, lastDeletedEmployee[3]);
-        pst.setDouble(5, Double.parseDouble(lastDeletedEmployee[4]));
-        pst.setString(6, lastDeletedEmployee[5]);
-
-        pst.executeUpdate();
-        pst.close();
-
-        JOptionPane.showMessageDialog(this, "Undo successful. Employee restored.");
-        lastDeletedEmployee = null;  // Clear after undo
-        loadEmployees();
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Undo failed: " + e.getMessage());
-    }
+        try (FileWriter fw = new FileWriter(FILE_PATH, true)) {
+            fw.write(String.join(",", lastDeletedEmployee) + "\n");
+            JOptionPane.showMessageDialog(this, "Undo successful.");
+            lastDeletedEmployee = null;
+            loadEmployees();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Undo failed: " + e.getMessage());
+        }
     }//GEN-LAST:event_UmdoDeleteButtonActionPerformed
 
     private void AddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddButtonActionPerformed
-    String id = jTextEmployeeID.getText();
-    String name = jTextName.getText();
-    String position = jTextPosition.getText();
-    String department = jTextDepartment.getText();
-    String email = jTextEmail.getText();
+            String[] newEmployee = {
+            jTextEmployeeID.getText(),
+            jTextName.getText(),
+            jTextPosition.getText(),
+            jTextDepartment.getText(),
+            jTextSalary.getText(),
+            jTextEmail.getText()
+        };
 
-    try {
-        double salary = Double.parseDouble(jTextSalary.getText());
-
-        this.conn = DBConnection.getConnection();
-        String sql = "INSERT INTO employees (id, name, position, department, salary, email) VALUES (?, ?, ?, ?, ?, ?)";
-        PreparedStatement pst = conn.prepareStatement(sql);
-
-        pst.setString(1, id);
-        pst.setString(2, name);
-        pst.setString(3, position);
-        pst.setString(4, department);
-        pst.setDouble(5, salary);
-        pst.setString(6, email);
-
-        pst.executeUpdate();
-        pst.close();
-
-        JOptionPane.showMessageDialog(null, "Employee added successfully!");
-        loadEmployees(); // <-- Refresh the table
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(null, "Invalid salary. Please enter a number.");
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-    }
+        try (FileWriter fw = new FileWriter(FILE_PATH, true)) {
+            fw.write(String.join(",", newEmployee) + "\n");
+            JOptionPane.showMessageDialog(this, "Employee added.");
+            loadEmployees();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error adding: " + e.getMessage());
+        }
     }//GEN-LAST:event_AddButtonActionPerformed
 
     private void jUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateButtonActionPerformed
-try (Connection conn = DBConnection.getConnection()) {
-        if (conn == null) return;
+        String id = jTextEmployeeID.getText();
+        List<String[]> employees = getAllEmployees();
+        boolean found = false;
 
-        String sql = "UPDATE employees SET name=?, position=?, department=?, salary=?, email=? WHERE id=?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, jTextName.getText());
-            pstmt.setString(2, jTextPosition.getText());
-            pstmt.setString(3, jTextDepartment.getText());
-            pstmt.setDouble(4, Double.parseDouble(jTextSalary.getText()));
-            pstmt.setString(5, jTextEmail.getText());
-            pstmt.setString(6, jTextEmployeeID.getText());
-
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Employee updated successfully.");
-                loadEmployees(); // Use the correct refresh method
-            } else {
-                JOptionPane.showMessageDialog(this, "Employee not found.");
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i)[0].equals(id)) {
+                employees.set(i, new String[]{
+                    id,
+                    jTextName.getText(),
+                    jTextPosition.getText(),
+                    jTextDepartment.getText(),
+                    jTextSalary.getText(),
+                    jTextEmail.getText()
+                });
+                found = true;
+                break;
             }
         }
-    } catch (SQLException | NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
-    }
+
+        if (found) {
+            saveAllEmployees(employees);
+            JOptionPane.showMessageDialog(this, "Employee updated.");
+            loadEmployees();
+        } else {
+            JOptionPane.showMessageDialog(this, "Employee ID not found.");
+        }
     }//GEN-LAST:event_jUpdateButtonActionPerformed
 
     private void jDeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteButtonActionPerformed
-    int selectedRow = jTable1.getSelectedRow();
-
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Please select a row to delete.");
-        return;
-    }
-
-    String id = jTable1.getValueAt(selectedRow, 0).toString(); // ID
-    String name = jTable1.getValueAt(selectedRow, 1).toString();
-    String position = jTable1.getValueAt(selectedRow, 2).toString();
-    String department = jTable1.getValueAt(selectedRow, 3).toString();
-    String salary = jTable1.getValueAt(selectedRow, 4).toString();
-    String email = jTable1.getValueAt(selectedRow, 5).toString();
-
-    int confirm = JOptionPane.showConfirmDialog(this, 
-        "Are you sure you want to delete Employee ID: " + id + "?", 
-        "Confirm Delete", 
-        JOptionPane.YES_NO_OPTION
-    );
-
-    if (confirm == JOptionPane.YES_OPTION) {
-        try {
-            this.conn = DBConnection.getConnection();
-            String sql = "DELETE FROM employees WHERE id = ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, id);
-
-            int affectedRows = pst.executeUpdate();
-            pst.close();
-
-            if (affectedRows > 0) {
-                // Save to class variable for undo
-                lastDeletedEmployee = new String[] { id, name, position, department, salary, email };
-                JOptionPane.showMessageDialog(this, "Employee deleted successfully.");
-                loadEmployees(); // Refresh
-            } else {
-                JOptionPane.showMessageDialog(this, "Employee ID not found.");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    int row = jTable1.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Select a row to delete.");
+            return;
         }
-    }
+
+        List<String[]> employees = getAllEmployees();
+        String idToDelete = jTable1.getValueAt(row, 0).toString();
+        Iterator<String[]> iterator = employees.iterator();
+
+        while (iterator.hasNext()) {
+            String[] emp = iterator.next();
+            if (emp[0].equals(idToDelete)) {
+                lastDeletedEmployee = emp;
+                iterator.remove();
+                break;
+            }
+        }
+
+        saveAllEmployees(employees);
+        JOptionPane.showMessageDialog(this, "Deleted.");
+        loadEmployees();
     }//GEN-LAST:event_jDeleteButtonActionPerformed
 
     private void BackButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButton1ActionPerformed

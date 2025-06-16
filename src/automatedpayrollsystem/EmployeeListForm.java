@@ -9,8 +9,7 @@ package automatedpayrollsystem;
  * @author Jomax
  */
 
-import javax.swing.table.DefaultTableModel;
-import java.sql.*;
+import javax.swing.JOptionPane;
 
 public class EmployeeListForm extends javax.swing.JFrame {
 
@@ -18,40 +17,19 @@ public class EmployeeListForm extends javax.swing.JFrame {
      * Creates new form EmployeeListForm
      */
     public EmployeeListForm() {
-    initComponents(); // auto-generated
-    setLocationRelativeTo(null);
-    // Call the method to load data
-    loadEmployeeData();
-}
+        initComponents();
+        setLocationRelativeTo(null);
 
-private void loadEmployeeData() {
-    DefaultTableModel model = (DefaultTableModel) employeeTable.getModel();
-    model.setRowCount(0); // Clear table rows
-
-    String sql = "SELECT * FROM employees";
-
-    try (Connection conn = DBConnection.getConnection();
-         Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String name = rs.getString("name");
-            String position = rs.getString("position");
-            String department = rs.getString("department");
-            double salary = rs.getDouble("salary");
-
-            model.addRow(new Object[]{id, name, position, department, salary});
+        // Load employee data from CSV
+        try {
+            EmployeeDataLoader loader = new EmployeeDataLoader("MotorPH_Employee_Data2.csv");
+            // Do something with the data, e.g., show in JTable
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Error loading employee data:\n" + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
-
-
-
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
