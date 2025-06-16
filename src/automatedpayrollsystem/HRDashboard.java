@@ -16,9 +16,11 @@ public class HRDashboard extends javax.swing.JFrame {
     /**
      * Creates new form HRDashboard
      */
-    public HRDashboard() {
-        initComponents();
-        setLocationRelativeTo(null);
+    public HRDashboard(String username) {        
+            initComponents();
+            setLocationRelativeTo(null);
+            jWelcomelabel.setText("Welcome, " + username); // <-- display username here
+
     }
 
     /**
@@ -37,6 +39,7 @@ public class HRDashboard extends javax.swing.JFrame {
         manageEmployeesButton = new javax.swing.JButton();
         viewEmployeeListButton1 = new javax.swing.JButton();
         ViewMySalaryPayslipButton = new javax.swing.JButton();
+        jWelcomelabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(800, 520));
@@ -75,7 +78,7 @@ public class HRDashboard extends javax.swing.JFrame {
                 LogoutButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(LogoutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 240, 210, -1));
+        getContentPane().add(LogoutButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 300, 210, -1));
 
         ViewLeaveRequestsButton.setBackground(new java.awt.Color(0, 172, 238));
         ViewLeaveRequestsButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -85,7 +88,7 @@ public class HRDashboard extends javax.swing.JFrame {
                 ViewLeaveRequestsButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(ViewLeaveRequestsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 190, 210, -1));
+        getContentPane().add(ViewLeaveRequestsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 210, -1));
 
         manageEmployeesButton.setBackground(new java.awt.Color(0, 172, 238));
         manageEmployeesButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -95,7 +98,7 @@ public class HRDashboard extends javax.swing.JFrame {
                 manageEmployeesButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(manageEmployeesButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 210, -1));
+        getContentPane().add(manageEmployeesButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, 210, -1));
 
         viewEmployeeListButton1.setBackground(new java.awt.Color(0, 172, 238));
         viewEmployeeListButton1.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -105,7 +108,7 @@ public class HRDashboard extends javax.swing.JFrame {
                 viewEmployeeListButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(viewEmployeeListButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 210, -1));
+        getContentPane().add(viewEmployeeListButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 210, 210, -1));
 
         ViewMySalaryPayslipButton.setBackground(new java.awt.Color(0, 172, 238));
         ViewMySalaryPayslipButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -115,7 +118,11 @@ public class HRDashboard extends javax.swing.JFrame {
                 ViewMySalaryPayslipButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(ViewMySalaryPayslipButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 140, 210, -1));
+        getContentPane().add(ViewMySalaryPayslipButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 210, 210, -1));
+
+        jWelcomelabel.setFont(new java.awt.Font("Impact", 0, 26)); // NOI18N
+        jWelcomelabel.setText("Welcome");
+        getContentPane().add(jWelcomelabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 130, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -130,7 +137,8 @@ if (confirm == JOptionPane.YES_OPTION) {
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void ViewLeaveRequestsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ViewLeaveRequestsButtonActionPerformed
-new HRDashboard().setVisible(true);
+        String username = null;
+new HRDashboard(username).setVisible(true);
 this.dispose(); // optional, if you want to close the current window
     }//GEN-LAST:event_ViewLeaveRequestsButtonActionPerformed
 
@@ -177,7 +185,8 @@ this.dispose(); // optional, if you want to close the current window
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new HRDashboard().setVisible(true);
+                String username = null;
+                new HRDashboard(username).setVisible(true);
             }
         });
     }
@@ -188,6 +197,7 @@ this.dispose(); // optional, if you want to close the current window
     private javax.swing.JButton ViewMySalaryPayslipButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jWelcomelabel;
     private javax.swing.JButton manageEmployeesButton;
     private javax.swing.JButton viewEmployeeListButton1;
     // End of variables declaration//GEN-END:variables

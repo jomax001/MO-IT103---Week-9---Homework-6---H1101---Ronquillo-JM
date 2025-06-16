@@ -80,7 +80,8 @@ public class EmployeeListForm extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
   this.dispose(); // Close the current form
-    new HRDashboard().setVisible(true); // Open the previous/main form
+        String username = null;
+    new HRDashboard(username).setVisible(true); // Open the previous/main form
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

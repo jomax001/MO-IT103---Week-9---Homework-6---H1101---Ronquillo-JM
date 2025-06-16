@@ -4,11 +4,18 @@
  */
 package automatedpayrollsystem;
 
+import automatedpayrollsystem.EmployeeDataLoader;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import javax.swing.JOptionPane;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 /**
  *
@@ -60,6 +67,8 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         ForgotPasswordorUsernameMouseClick = new javax.swing.JLabel();
         jPasswordField = new javax.swing.JPasswordField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea = new javax.swing.JTextArea();
         Login = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -138,6 +147,12 @@ public class LoginForm extends javax.swing.JFrame {
         });
         getContentPane().add(ForgotPasswordorUsernameMouseClick, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, -1, -1));
         getContentPane().add(jPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 200, 180, -1));
+
+        jTextArea.setColumns(20);
+        jTextArea.setRows(5);
+        jScrollPane1.setViewportView(jTextArea);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 120, 300, 250));
         setJMenuBar(Login);
 
         pack();
@@ -156,54 +171,39 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jCancelButtonActionPerformed
 
     private void jLoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoginButtonActionPerformed
-   String username = JUsernameTextField.getText().trim();
-    String password = new String(jPasswordField.getPassword()).trim();
-    String selectedRole = rolecombobox.getSelectedItem().toString().trim();
+    if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"));
+            String line;
+            StringBuilder result = new StringBuilder();
 
-    try (BufferedReader br = new BufferedReader(new FileReader("MotorPH_Employee_Data2.csv"))) {
-        String line;
-        boolean found = false;
+            // Skip header
+            reader.readLine();
 
-        // Skip header
-        br.readLine(); 
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",", -1); // -1 = include empty values
 
-        while ((line = br.readLine()) != null) {
-            String[] parts = line.split(",", -1); // -1 to avoid ignoring empty columns
+                if (data.length < 17) continue;
 
-            if (parts.length < 21) continue; // Ensure correct column length
+                String position = data[10].trim();
 
-            String filePassword = parts[19].trim(); // Column 20
-            String fileUsername = parts[20].trim(); // Column 21
-            String position = parts[12].trim();     // Column 12
+                if (position.equals("HR Manager") || 
+                    position.equals("HR Team Leader") || 
+                    position.equals("HR Rank and File")) {
 
-            if (fileUsername.equals(username) && filePassword.equals(password)) {
-                // Now validate the role
-                if (selectedRole.equalsIgnoreCase("HR Personnel")) {
-                    if (position.equalsIgnoreCase("HR Manager") ||
-                        position.equalsIgnoreCase("HR Team Leader") ||
-                        position.equalsIgnoreCase("HR Rank and File")) {
-                        found = true;
-                        JOptionPane.showMessageDialog(this, "✅ Login successful as HR Personnel (" + position + ")");
-                        new HRDashboard().setVisible(true); // replace with your own class
-                        this.dispose();
-                        break;
-                    }
-                } else if (selectedRole.equalsIgnoreCase("Payroll Manager") && position.equalsIgnoreCase("Payroll Manager")) {
-                    found = true;
-                    JOptionPane.showMessageDialog(this, "✅ Login successful as Payroll Manager");
-                    new PayrollManagerDashboard().setVisible(true); // replace with your own class
-                    this.dispose();
-                    break;
+                    result.append("Name: ").append(data[1].trim())  // Assuming column 2 = Name
+                          .append(" | Position: ").append(position)
+                          .append("\n");
                 }
             }
-        }
 
-        if (!found) {
-            JOptionPane.showMessageDialog(this, "❌ Invalid username, password, or role/position.");
+            reader.close();
+            jTextArea.setText(result.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            jTextArea.setText("Error reading file: " + e.getMessage());
         }
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "❌ Error reading file: " + e.getMessage());
-        e.printStackTrace();
     }
     }//GEN-LAST:event_jLoginButtonActionPerformed
 
@@ -256,8 +256,8 @@ public class LoginForm extends javax.swing.JFrame {
     private javax.swing.JButton jLoginButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea;
     private javax.swing.JComboBox<String> rolecombobox;
     // End of variables declaration//GEN-END:variables
-
-
 }
