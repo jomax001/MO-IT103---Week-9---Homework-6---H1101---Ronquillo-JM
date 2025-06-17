@@ -9,7 +9,11 @@ package automatedpayrollsystem;
  * @author Jomax
  */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class EmployeeListForm extends javax.swing.JFrame {
 
@@ -19,17 +23,56 @@ public class EmployeeListForm extends javax.swing.JFrame {
     public EmployeeListForm() {
         initComponents();
         setLocationRelativeTo(null);
+        loadEmployeeData();  // Load the employee data when the form opens
+            employeeTable.setAutoResizeMode(employeeTable.AUTO_RESIZE_OFF);
+            
+            // Set preferred column widths
+    employeeTable.getColumnModel().getColumn(0).setPreferredWidth(100); // Employee ID
+    employeeTable.getColumnModel().getColumn(1).setPreferredWidth(120); // Last Name
+    employeeTable.getColumnModel().getColumn(2).setPreferredWidth(120); // First Name
+    employeeTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Birthday
+    employeeTable.getColumnModel().getColumn(4).setPreferredWidth(200); // Address
+    employeeTable.getColumnModel().getColumn(5).setPreferredWidth(120); // Phone Number
+    employeeTable.getColumnModel().getColumn(6).setPreferredWidth(100); // SSS #
+    employeeTable.getColumnModel().getColumn(7).setPreferredWidth(120); // Philhealth #
+    employeeTable.getColumnModel().getColumn(8).setPreferredWidth(120); // TIN #
+    employeeTable.getColumnModel().getColumn(9).setPreferredWidth(120); // Pag-ibig #
+    employeeTable.getColumnModel().getColumn(10).setPreferredWidth(100); // Status
+    employeeTable.getColumnModel().getColumn(11).setPreferredWidth(150); // Immediate Sup.
+    employeeTable.getColumnModel().getColumn(12).setPreferredWidth(120); // Basic Salary
+    employeeTable.getColumnModel().getColumn(13).setPreferredWidth(100); // Rice Subsidy
+    employeeTable.getColumnModel().getColumn(14).setPreferredWidth(120); // Phone Allowance
+    employeeTable.getColumnModel().getColumn(15).setPreferredWidth(130); // Clothing Allowance
+    employeeTable.getColumnModel().getColumn(16).setPreferredWidth(120); // Gross Salary
+    employeeTable.getColumnModel().getColumn(17).setPreferredWidth(100); // Hourly Rate
+}
 
-        // Load employee data from CSV
+       private void loadEmployeeData() {
+        DefaultTableModel model = (DefaultTableModel) employeeTable.getModel();
+        model.setRowCount(0); // Clear the table before loading new data
+
         try {
-            EmployeeDataLoader loader = new EmployeeDataLoader();
-            // Do something with the data, e.g., show in JTable
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "Error loading employee data:\n" + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+            BufferedReader reader = new BufferedReader(new FileReader("src/automatedpayrollsystem/MotorPH_Employee_Database.csv"));
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // Skip the header row
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+
+                // Add the entire row to the JTable
+                model.addRow(parts);
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error reading CSV file: " + e.getMessage());
         }
-    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -43,9 +86,10 @@ public class EmployeeListForm extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         employeeTable = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(570, 650));
+        setPreferredSize(new java.awt.Dimension(1350, 650));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton1.setBackground(new java.awt.Color(0, 172, 238));
@@ -56,24 +100,29 @@ public class EmployeeListForm extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 510, 121, -1));
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 550, 121, -1));
 
         employeeTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Employee ID", "Name", "Position", "Department", "Salary", "Email"
+                "Employee ID", "Last Name", "First Name", "Birthday", "Address", "Phone Number", "SSS #", "Philhealth #", "TIN #", "Pag-ibig #", "Status", "Immediate Supervisor", "Basic Salary", "Rice Subsidy", "Phone Allowance", "Clothing Allowance", "Gross Semi-monthly Rate", "Hourly Rate"
             }
         ));
+        employeeTable.setAlignmentX(10.0F);
+        employeeTable.setAlignmentY(10.0F);
+        employeeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        employeeTable.setPreferredSize(new java.awt.Dimension(1500, 500));
         jScrollPane2.setViewportView(employeeTable);
 
         jScrollPane1.setViewportView(jScrollPane2);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 0, 546, 489));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 0, 1290, 530));
+        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -124,5 +173,6 @@ public class EmployeeListForm extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,6 +4,9 @@
  */
 package automatedpayrollsystem;
 
+import automatedpayrollsystem.EmployeeListForm;
+import automatedpayrollsystem.LoginForm;
+import automatedpayrollsystem.ManageEmployeeForm;
 import javax.swing.JOptionPane;
 
 
@@ -151,7 +154,9 @@ this.dispose(); // optional, if you want to close the current window
     }//GEN-LAST:event_manageEmployeesButtonActionPerformed
 
     private void viewEmployeeListButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewEmployeeListButton1ActionPerformed
-        // TODO add your handling code here:
+    EmployeeListForm employeeList = new EmployeeListForm();
+    employeeList.setVisible(true);
+    this.dispose();  // close current window
     }//GEN-LAST:event_viewEmployeeListButton1ActionPerformed
 
     private void ViewMySalaryPayslipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ViewMySalaryPayslipButtonActionPerformed

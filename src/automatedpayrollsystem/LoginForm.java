@@ -31,10 +31,17 @@ public class LoginForm extends javax.swing.JFrame {
     /**
      * Creates new form LoginForm
      */
+    
+        private char defaultEchoChar;
+        private boolean passwordVisible = false;
+    
     public LoginForm() {
         initComponents();
         setLocationRelativeTo(null); // This centers the window
     // Check if CSV file loaded properly
+    
+        defaultEchoChar = jPasswordField.getEchoChar();
+        jPasswordField.setEchoChar(defaultEchoChar);
     try {
         EmployeeDataLoader loader = new EmployeeDataLoader();
         if (loader.getAllEmployees().isEmpty()) {
@@ -72,8 +79,7 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         ForgotPasswordorUsernameMouseClick = new javax.swing.JLabel();
         jPasswordField = new javax.swing.JPasswordField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea = new javax.swing.JTextArea();
+        jShowPasswordButton = new javax.swing.JButton();
         Login = new javax.swing.JMenuBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -130,8 +136,8 @@ public class LoginForm extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Impact", 0, 30)); // NOI18N
-        jLabel1.setText("Motor PH Payroll System");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 30, 320, -1));
+        jLabel1.setText("Automated Payroll System");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 30, 340, -1));
 
         jLabel2.setFont(new java.awt.Font("Impact", 0, 21)); // NOI18N
         jLabel2.setText("By: Jomax");
@@ -153,11 +159,14 @@ public class LoginForm extends javax.swing.JFrame {
         getContentPane().add(ForgotPasswordorUsernameMouseClick, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, -1, -1));
         getContentPane().add(jPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 200, 180, -1));
 
-        jTextArea.setColumns(20);
-        jTextArea.setRows(5);
-        jScrollPane1.setViewportView(jTextArea);
-
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 370, 360, 50));
+        jShowPasswordButton.setFont(new java.awt.Font("Impact", 0, 14)); // NOI18N
+        jShowPasswordButton.setText("Show Password");
+        jShowPasswordButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jShowPasswordButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jShowPasswordButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 200, -1, -1));
         setJMenuBar(Login);
 
         pack();
@@ -176,73 +185,71 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jCancelButtonActionPerformed
 
     private void jLoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoginButtonActionPerformed
-File file = new File("MotorPH_Employee_Data2.csv");
-System.out.println("File exists: " + file.exists());
-System.out.println("Absolute path: " + file.getAbsolutePath());
+String inputUsername = JUsernameTextField.getText().trim();
+String inputPassword = new String(jPasswordField.getPassword()).trim();
 
+boolean found = false;
+
+try {
+    // Open the CSV file that contains employee data
+    BufferedReader reader = new BufferedReader(new FileReader("src/automatedpayrollsystem/MotorPH_Employee_Data_with_Login.csv"));
+    String line;
+    boolean isFirstLine = true;
+    
+    // Read the file line by line
+    while ((line = reader.readLine()) != null) {
+        if (isFirstLine) {
+            isFirstLine = false; // Skip the header row
+            continue;
+        }
         
-if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
-    try {
-        BufferedReader reader = new BufferedReader(new FileReader("MotorPH_Employee_Data.csv"));
-        String line;
-        boolean found = false;
+        String[] parts = line.split(","); // Split the line by comma (CSV format)
 
-        // Skip header
-        reader.readLine();
+        // Adjust column index based on your CSV file structure
+        String username = parts[0].trim();  
+        String password = parts[1].trim();
+        
+        System.out.println("CSV Username: [" + username + "]");
+        System.out.println("CSV Password: [" + password + "]");
+        System.out.println("Input Username: [" + inputUsername + "]");
+        System.out.println("Input Password: [" + inputPassword + "]");
 
-        while ((line = reader.readLine()) != null) {
-            String[] data = line.split(",", -1); // -1 to include empty fields
-
-            if (data.length < 21) continue;
-
-            String username = JUsernameTextField.getText().trim();
-            String password = jPasswordField.getText().trim();
-            String selectedRole = rolecombobox.getSelectedItem().toString();
-
-            String fileUsername = data[20].trim().replace("\"", "");
-            String filePassword = data[19].trim().replace("\"", "");
-            String fileRole = data[13].trim().replace("\"", "");
-            
-                    System.out.println("Trying to match:");
-                    System.out.println("Input Username: [" + username + "]");
-                    System.out.println("File Username: [" + fileUsername + "]");
-                    System.out.println("Input Password: [" + password + "]");
-                    System.out.println("File Password: [" + filePassword + "]");
-                    System.out.println("Input Role: [" + selectedRole + "]");
-                    System.out.println("File Role: [" + fileRole + "]");
-
-            boolean isHRMatch = selectedRole.equals("HR Personnel") &&
-                                (fileRole.equals("HR Manager") ||
-                                 fileRole.equals("HR Team Leader") ||
-                                 fileRole.equals("HR Rank and File"));
-
-            if ((isHRMatch || selectedRole.equals(fileRole)) &&
-                username.equals(fileUsername) &&
-                password.equals(filePassword)) {
-
-                found = true;
-                JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                // OPEN HRDashboard
-                HRDashboard hr = new HRDashboard(username);
-                hr.setVisible(true);
-                this.setVisible(false);
-                break;
-            }
+        // Compare input credentials with the current row
+        if (inputUsername.equals(username) && inputPassword.equals(password)) {
+            found = true;
+            break;
         }
-
-        reader.close();
-
-        if (!found) {
-            JOptionPane.showMessageDialog(this, "Invalid login credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+    
+    reader.close();
+    
+    if (found) {
+        JOptionPane.showMessageDialog(this, "✅ Login successful!");
+
+        // Open the HR Dashboard window and close the LoginForm
+        HRDashboard dashboard = new HRDashboard(inputUsername);
+        dashboard.setVisible(true);
+        this.dispose();
+        
+    } else {
+        JOptionPane.showMessageDialog(this, "❌ Invalid username or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+    }
+} catch (IOException e) {
+    JOptionPane.showMessageDialog(this, "❌ Error reading CSV file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 }
     }//GEN-LAST:event_jLoginButtonActionPerformed
+
+    private void jShowPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jShowPasswordButtonActionPerformed
+if (!passwordVisible) {
+            jPasswordField.setEchoChar((char) 0);  // show password
+            jShowPasswordButton.setText("Hide");
+            passwordVisible = true;
+        } else {
+            jPasswordField.setEchoChar(defaultEchoChar);  // hide password
+            jShowPasswordButton.setText("Show");
+            passwordVisible = false;
+        }
+    }//GEN-LAST:event_jShowPasswordButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -293,8 +300,7 @@ if (rolecombobox.getSelectedItem().toString().equals("HR Personnel")) {
     private javax.swing.JButton jLoginButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea;
+    private javax.swing.JButton jShowPasswordButton;
     private javax.swing.JComboBox<String> rolecombobox;
     // End of variables declaration//GEN-END:variables
 }
