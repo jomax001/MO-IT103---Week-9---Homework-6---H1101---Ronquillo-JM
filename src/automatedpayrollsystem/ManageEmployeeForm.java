@@ -4,42 +4,95 @@
  */
 package automatedpayrollsystem;
 
+import automatedpayrollsystem.HRDashboard;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.util.*;
+
 /**
  *
  * @author Jomax
  */
 public class ManageEmployeeForm extends javax.swing.JFrame {
-
+    
     private final String FILE_PATH = "employees.csv";
     private String[] lastDeletedEmployee = null;
+    
+    private Object[] lastDeletedRow = null;
+    private int lastDeletedRowIndex = -1;
 
     public ManageEmployeeForm() {
         initComponents();
         setLocationRelativeTo(null);
-        loadEmployees();
+        loadCSVData();
+        jEmployeeTable2.setAutoResizeMode(jEmployeeTable2.AUTO_RESIZE_OFF);
     }
+    
+    private void undoDelete() {
+        DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
 
-    private void loadEmployees() {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
+        if (lastDeletedRow != null && lastDeletedRowIndex >= 0) {
+            model.insertRow(lastDeletedRowIndex, lastDeletedRow);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
-            String line;
-            br.readLine(); // skip header
-            while ((line = br.readLine()) != null) {
-                String[] row = line.split(",");
-                if (row.length == 6) {
-                    model.addRow(row);
-                }
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Failed to load employees: " + e.getMessage());
+            lastDeletedRow = null;
+            lastDeletedRowIndex = -1;
+
+            saveTableToCSV("src/automatedpayrollsystem/MotorPH_Employee_Database.csv");
+            loadCSVData();
+        } else {
+            JOptionPane.showMessageDialog(this, "Nothing to undo.");
         }
     }
+
+    private void saveTableToCSV(String filePath) {
+    try (FileWriter fw = new FileWriter(filePath)) {
+        DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
+        int columnCount = model.getColumnCount();
+
+        // Write headers
+        for (int i = 0; i < columnCount; i++) {
+            fw.write(model.getColumnName(i));
+            if (i < columnCount - 1) fw.write(",");
+        }
+        fw.write("\n");
+
+        // Write rows
+        for (int i = 0; i < model.getRowCount(); i++) {
+            for (int j = 0; j < columnCount; j++) {
+                fw.write(String.valueOf(model.getValueAt(i, j)));
+                if (j < columnCount - 1) fw.write(",");
+            }
+            fw.write("\n");
+        }
+
+        fw.flush();
+        JOptionPane.showMessageDialog(this, "CSV file updated successfully!");
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Error saving to CSV: " + e.getMessage());
+    }
+}
+
+    private void loadCSVData() {
+    DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
+    model.setRowCount(0); // clear existing data
+
+    try (BufferedReader br = new BufferedReader(new FileReader("src/automatedpayrollsystem/MotorPH_Employee_Database.csv"))) {
+        String line;
+        boolean isFirstLine = true;
+
+        while ((line = br.readLine()) != null) {
+            if (isFirstLine) {
+                isFirstLine = false; // skip CSV header
+                continue;
+            }
+            String[] row = line.split(",", -1); // include empty fields
+            model.addRow(row);
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Failed to load CSV data: " + e.getMessage());
+    }
+}
 
 private void saveAllEmployees(List<String[]> employees) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_PATH))) {
@@ -75,68 +128,100 @@ private void saveAllEmployees(List<String[]> employees) {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTextEmail = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        jEmployeeTable2 = new javax.swing.JTable();
+        jTextPhoneNumber = new javax.swing.JTextField();
+        jEmployeeID = new javax.swing.JLabel();
+        jPhoneNumber = new javax.swing.JLabel();
+        jLLastName = new javax.swing.JLabel();
+        jFirstName = new javax.swing.JLabel();
+        jBirthday = new javax.swing.JLabel();
         jTextEmployeeID = new javax.swing.JTextField();
-        jTextName = new javax.swing.JTextField();
-        jTextPosition = new javax.swing.JTextField();
-        jTextDepartment = new javax.swing.JTextField();
+        jTextLastName = new javax.swing.JTextField();
+        jTextFirstName = new javax.swing.JTextField();
+        jTextBirthday = new javax.swing.JTextField();
         UmdoDeleteButton = new javax.swing.JButton();
         AddButton = new javax.swing.JButton();
         jUpdateButton = new javax.swing.JButton();
         jDeleteButton = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
-        jTextSalary = new javax.swing.JTextField();
+        jAddress = new javax.swing.JLabel();
+        jTextAddress = new javax.swing.JTextField();
         BackButton1 = new javax.swing.JButton();
+        jTextStatus = new javax.swing.JTextField();
+        jStatus = new javax.swing.JLabel();
+        jSSS = new javax.swing.JLabel();
+        jPhilhealth = new javax.swing.JLabel();
+        jTIN = new javax.swing.JLabel();
+        jTextSSS = new javax.swing.JTextField();
+        jTextPhilhealth = new javax.swing.JTextField();
+        jTextTIN = new javax.swing.JTextField();
+        jPagibig = new javax.swing.JLabel();
+        jTextPagibig = new javax.swing.JTextField();
+        jTextPhoneAllowance = new javax.swing.JTextField();
+        jPhoneAllowance = new javax.swing.JLabel();
+        jPosition = new javax.swing.JLabel();
+        jImmediateSupervisor = new javax.swing.JLabel();
+        jBasicSalary = new javax.swing.JLabel();
+        jTextPosition = new javax.swing.JTextField();
+        jTextImmediateSupervisor = new javax.swing.JTextField();
+        jTextBasicSalary = new javax.swing.JTextField();
+        jRiceSubsidy = new javax.swing.JLabel();
+        jTextRiceSubsidy = new javax.swing.JTextField();
+        jTextHorulyRate = new javax.swing.JTextField();
+        jPhoneAllowance1 = new javax.swing.JLabel();
+        jClothingAllowance = new javax.swing.JLabel();
+        jTextClothingAllowance = new javax.swing.JTextField();
+        jRiceSubsidy1 = new javax.swing.JLabel();
+        jTextGross = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1400, 520));
+        setPreferredSize(new java.awt.Dimension(1550, 850));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jEmployeeTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Employee ID", "Name", "Position", "Department", "Salary", "Email"
+                "Employee #", "First Name", "First Name", "Birthday", "Address", "Phone Number", "SSS #", "Philhealth #", "TIN #", "Pag-ibig #", "Status", "Position", "Immediate Supervisor", "Basic Salary", "Rice Subsidy", "Phone Allowance", "Clothing Allowance", "Gross Semi-monthly Rate", "Hourly Rate"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(jEmployeeTable2);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(14, 6, 960, 410));
-        getContentPane().add(jTextEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 220, 200, -1));
 
-        jLabel1.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel1.setText("Employee ID:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 20, 150, -1));
+        jTextPhoneNumber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextPhoneNumberActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextPhoneNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 220, 200, -1));
 
-        jLabel2.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel2.setText("Email: ");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 220, 140, -1));
+        jEmployeeID.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jEmployeeID.setText("Employee ID:");
+        getContentPane().add(jEmployeeID, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 20, 230, -1));
 
-        jLabel3.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel3.setText("Name:");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 60, 150, -1));
+        jPhoneNumber.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPhoneNumber.setText("Phone Number:");
+        getContentPane().add(jPhoneNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 220, 240, -1));
 
-        jLabel4.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel4.setText("Position:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 100, 140, -1));
+        jLLastName.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jLLastName.setText("Last Name:");
+        getContentPane().add(jLLastName, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 60, 240, -1));
 
-        jLabel5.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel5.setText("Department:");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 140, 150, -1));
-        getContentPane().add(jTextEmployeeID, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 20, 200, -1));
-        getContentPane().add(jTextName, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 60, 200, -1));
-        getContentPane().add(jTextPosition, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 100, 200, -1));
-        getContentPane().add(jTextDepartment, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 140, 200, -1));
+        jFirstName.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jFirstName.setText("First Name:");
+        getContentPane().add(jFirstName, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 100, 260, -1));
+
+        jBirthday.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jBirthday.setText("Birthday:");
+        getContentPane().add(jBirthday, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 140, 270, -1));
+        getContentPane().add(jTextEmployeeID, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 20, 200, -1));
+        getContentPane().add(jTextLastName, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 60, 200, -1));
+        getContentPane().add(jTextFirstName, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 100, 200, -1));
+        getContentPane().add(jTextBirthday, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 140, 200, -1));
 
         UmdoDeleteButton.setBackground(new java.awt.Color(0, 172, 238));
         UmdoDeleteButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -146,7 +231,7 @@ private void saveAllEmployees(List<String[]> employees) {
                 UmdoDeleteButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(UmdoDeleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 350, 140, -1));
+        getContentPane().add(UmdoDeleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 530, 140, 30));
 
         AddButton.setBackground(new java.awt.Color(0, 172, 238));
         AddButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -156,7 +241,7 @@ private void saveAllEmployees(List<String[]> employees) {
                 AddButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(AddButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 310, 140, -1));
+        getContentPane().add(AddButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 480, 140, 30));
 
         jUpdateButton.setBackground(new java.awt.Color(0, 172, 238));
         jUpdateButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -166,7 +251,7 @@ private void saveAllEmployees(List<String[]> employees) {
                 jUpdateButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jUpdateButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 310, 140, -1));
+        getContentPane().add(jUpdateButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 480, 140, 30));
 
         jDeleteButton.setBackground(new java.awt.Color(0, 172, 238));
         jDeleteButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -176,12 +261,12 @@ private void saveAllEmployees(List<String[]> employees) {
                 jDeleteButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jDeleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 350, 140, -1));
+        getContentPane().add(jDeleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 530, 140, 30));
 
-        jLabel6.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
-        jLabel6.setText("Salary:");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 180, 140, -1));
-        getContentPane().add(jTextSalary, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 180, 200, -1));
+        jAddress.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jAddress.setText("Address:");
+        getContentPane().add(jAddress, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 180, 240, -1));
+        getContentPane().add(jTextAddress, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 180, 200, -1));
 
         BackButton1.setBackground(new java.awt.Color(0, 172, 238));
         BackButton1.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -191,105 +276,302 @@ private void saveAllEmployees(List<String[]> employees) {
                 BackButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(BackButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 390, 140, -1));
+        getContentPane().add(BackButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 580, 140, 30));
+
+        jTextStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextStatusActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 420, 200, -1));
+
+        jStatus.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jStatus.setText("Status:");
+        getContentPane().add(jStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 420, 240, -1));
+
+        jSSS.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jSSS.setText("SSS Number:");
+        getContentPane().add(jSSS, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 260, 240, -1));
+
+        jPhilhealth.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPhilhealth.setText("Philhealth Number:");
+        getContentPane().add(jPhilhealth, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 300, 240, -1));
+
+        jTIN.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jTIN.setText("TIN Number:");
+        getContentPane().add(jTIN, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 340, 260, -1));
+        getContentPane().add(jTextSSS, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 260, 200, -1));
+        getContentPane().add(jTextPhilhealth, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 300, 200, -1));
+        getContentPane().add(jTextTIN, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 340, 200, -1));
+
+        jPagibig.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPagibig.setText("Pag-ibig Number:");
+        getContentPane().add(jPagibig, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 380, 230, -1));
+        getContentPane().add(jTextPagibig, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 380, 200, -1));
+
+        jTextPhoneAllowance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextPhoneAllowanceActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextPhoneAllowance, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 620, 200, -1));
+
+        jPhoneAllowance.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPhoneAllowance.setText("Phone Allowance:");
+        getContentPane().add(jPhoneAllowance, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 620, 250, -1));
+
+        jPosition.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPosition.setText("Position:");
+        getContentPane().add(jPosition, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 460, 250, -1));
+
+        jImmediateSupervisor.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jImmediateSupervisor.setText("Immediate Supervisor:");
+        getContentPane().add(jImmediateSupervisor, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 500, 230, -1));
+
+        jBasicSalary.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jBasicSalary.setText("Basic Salary:");
+        getContentPane().add(jBasicSalary, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 540, 260, -1));
+        getContentPane().add(jTextPosition, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 460, 200, -1));
+        getContentPane().add(jTextImmediateSupervisor, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 500, 200, -1));
+        getContentPane().add(jTextBasicSalary, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 540, 200, -1));
+
+        jRiceSubsidy.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jRiceSubsidy.setText("Rice Subsidy:");
+        getContentPane().add(jRiceSubsidy, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 580, 270, -1));
+        getContentPane().add(jTextRiceSubsidy, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 580, 200, -1));
+
+        jTextHorulyRate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextHorulyRateActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextHorulyRate, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 740, 200, -1));
+
+        jPhoneAllowance1.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jPhoneAllowance1.setText("Hourly Rate:");
+        getContentPane().add(jPhoneAllowance1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 740, 240, -1));
+
+        jClothingAllowance.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jClothingAllowance.setText("Clothing Allowance:");
+        getContentPane().add(jClothingAllowance, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 660, 260, -1));
+        getContentPane().add(jTextClothingAllowance, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 660, 200, -1));
+
+        jRiceSubsidy1.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
+        jRiceSubsidy1.setText("Gross Semi-monthly Rate:");
+        getContentPane().add(jRiceSubsidy1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 700, 260, -1));
+        getContentPane().add(jTextGross, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 700, 200, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void UmdoDeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UmdoDeleteButtonActionPerformed
-        if (lastDeletedEmployee == null) {
-            JOptionPane.showMessageDialog(this, "No deleted record to restore.");
-            return;
-        }
+if (lastDeletedRow != null && lastDeletedRowIndex != -1) {
+        DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
 
-        try (FileWriter fw = new FileWriter(FILE_PATH, true)) {
-            fw.write(String.join(",", lastDeletedEmployee) + "\n");
-            JOptionPane.showMessageDialog(this, "Undo successful.");
-            lastDeletedEmployee = null;
-            loadEmployees();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Undo failed: " + e.getMessage());
-        }
+        // Ibalik ang deleted row
+        model.insertRow(lastDeletedRowIndex, lastDeletedRow);
+
+        // Save and reload
+        saveTableToCSV("src/automatedpayrollsystem/MotorPH_Employee_Database.csv");
+        loadCSVData();
+
+        // Clear undo buffer
+        lastDeletedRow = null;
+        lastDeletedRowIndex = -1;
+
+        JOptionPane.showMessageDialog(this, "Last deleted row has been restored.");
+    } else {
+        JOptionPane.showMessageDialog(this, "No deleted row to undo.");
+    }
     }//GEN-LAST:event_UmdoDeleteButtonActionPerformed
 
     private void AddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddButtonActionPerformed
-            String[] newEmployee = {
-            jTextEmployeeID.getText(),
-            jTextName.getText(),
-            jTextPosition.getText(),
-            jTextDepartment.getText(),
-            jTextSalary.getText(),
-            jTextEmail.getText()
-        };
+// Step 1: Get data from input fields
+    String employeeID = jTextEmployeeID.getText().trim();
+    String lastName = jTextLastName.getText().trim();
+    String firstName = jTextFirstName.getText().trim();
+    String birthday = jTextBirthday.getText().trim();
+    String address = jTextAddress.getText().trim();
+    String phoneNumber = jTextPhoneNumber.getText().trim();
+    String SSSNumber = jTextSSS.getText().trim();
+    String Philhealth = jTextPhilhealth.getText().trim();
+    String TIN = jTextTIN.getText().trim();
+    String pagibig = jTextPagibig.getText().trim();
+    String status = jTextStatus.getText().trim();
+    String position = jTextPosition.getText().trim();
+    String immediateSupervisor = jTextImmediateSupervisor.getText().trim();
+    String basicSalary = jTextBasicSalary.getText().trim();
+    String riceSubsidy = jTextRiceSubsidy.getText().trim();
+    String phoneAllowance = jTextPhoneAllowance.getText().trim();
+    String clothingAllowance = jTextClothingAllowance.getText().trim();
+    String grosssSemiMonthlyRate = jTextGross.getText().trim();
+    String hourlyRate = jTextHorulyRate.getText().trim();
+    // ... Add all remaining fields here in the correct order
 
-        try (FileWriter fw = new FileWriter(FILE_PATH, true)) {
-            fw.write(String.join(",", newEmployee) + "\n");
-            JOptionPane.showMessageDialog(this, "Employee added.");
-            loadEmployees();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error adding: " + e.getMessage());
-        }
+    // Step 2: Append the data to the CSV file
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("src/automatedpayrollsystem/MotorPH_Employee_Database.csv", true))) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(employeeID).append(",");
+        sb.append(lastName).append(",");
+        sb.append(firstName).append(",");
+        sb.append(birthday).append(",");
+        sb.append(address).append(",");
+        sb.append(phoneNumber).append(",");
+        sb.append(SSSNumber).append(",");
+        sb.append(Philhealth).append(",");
+        sb.append(TIN).append(",");
+        sb.append(pagibig).append(",");
+        sb.append(status).append(",");
+        sb.append(position).append(",");
+        sb.append(immediateSupervisor).append(",");
+        sb.append(basicSalary).append(",");
+        sb.append(riceSubsidy).append(",");
+        sb.append(phoneAllowance).append(",");
+        sb.append(clothingAllowance).append(",");
+        sb.append(grosssSemiMonthlyRate).append(",");
+        sb.append(hourlyRate).append(",");
+        // ... Append all other fields here in the same order as your CSV
+
+        sb.append("\n"); // Add a new line after the data row
+
+        bw.write(sb.toString()); // Write the line to the file
+        bw.flush();
+
+        // Step 3: Show success message
+        JOptionPane.showMessageDialog(this, "Employee added successfully!");
+    } catch (IOException ex) {
+        // Show error message if saving fails
+        JOptionPane.showMessageDialog(this, "Error saving employee: " + ex.getMessage());
+    }
+
+    // Step 4: Reload table data to reflect the new entry
+    loadCSVData();
     }//GEN-LAST:event_AddButtonActionPerformed
 
     private void jUpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUpdateButtonActionPerformed
-        String id = jTextEmployeeID.getText();
-        List<String[]> employees = getAllEmployees();
-        boolean found = false;
+    int selectedRow = jEmployeeTable2.getSelectedRow();
+    DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
 
-        for (int i = 0; i < employees.size(); i++) {
-            if (employees.get(i)[0].equals(id)) {
-                employees.set(i, new String[]{
-                    id,
-                    jTextName.getText(),
-                    jTextPosition.getText(),
-                    jTextDepartment.getText(),
-                    jTextSalary.getText(),
-                    jTextEmail.getText()
-                });
-                found = true;
-                break;
-            }
-        }
+    if (selectedRow != -1) {
+        // Get existing values from the selected row
+        String currentEmployeeID = model.getValueAt(selectedRow, 0).toString();
+        String currentLastName = model.getValueAt(selectedRow, 1).toString();
+        String currentFirstName = model.getValueAt(selectedRow, 2).toString();
+        String currentBirthday = model.getValueAt(selectedRow, 3).toString();
+        String currentAddress = model.getValueAt(selectedRow, 4).toString();
+        String currentPhoneNumber = model.getValueAt(selectedRow, 5).toString();
+        String currentSSS = model.getValueAt(selectedRow, 6).toString();
+        String currentPhilhealth = model.getValueAt(selectedRow, 7).toString();
+        String currentTIN = model.getValueAt(selectedRow, 8).toString();
+        String currentPagibig = model.getValueAt(selectedRow, 9).toString();
+        String currentStatus = model.getValueAt(selectedRow, 10).toString();
+        String currentPosition = model.getValueAt(selectedRow, 11).toString();
+        String currentImmediateSupervisor = model.getValueAt(selectedRow, 12).toString();
+        String currentBasicSalary = model.getValueAt(selectedRow, 13).toString();
+        String currentRiceSubsidy = model.getValueAt(selectedRow, 14).toString();
+        String currentPhoneAllowance = model.getValueAt(selectedRow, 15).toString();
+        String currentClothingAllowance = model.getValueAt(selectedRow, 16).toString();
+        String currentGross = model.getValueAt(selectedRow, 17).toString();
+        String currentHourlyRate = model.getValueAt(selectedRow, 18).toString();
 
-        if (found) {
-            saveAllEmployees(employees);
-            JOptionPane.showMessageDialog(this, "Employee updated.");
-            loadEmployees();
-        } else {
-            JOptionPane.showMessageDialog(this, "Employee ID not found.");
-        }
+        // Get new values from text fields
+        String updatedEmployeeID = jTextEmployeeID.getText().trim();
+        String updatedLastName = jTextLastName.getText().trim();
+        String updatedFirstName = jTextFirstName.getText().trim();
+        String updatedBirthday = jTextBirthday.getText().trim();
+        String updatedAddress = jTextAddress.getText().trim();
+        String updatedPhoneNumber = jTextPhoneNumber.getText().trim();
+        String updatedSSS = jTextSSS.getText().trim();
+        String updatedPhilhealth = jTextPhilhealth.getText().trim();
+        String updatedTIN = jTextTIN.getText().trim();
+        String updatedPagibig = jTextPagibig.getText().trim();
+        String updatedStatus = jTextStatus.getText().trim();
+        String updatedPosition = jTextPosition.getText().trim();
+        String updatedImmediateSupervisor = jTextImmediateSupervisor.getText().trim();
+        String updatedBasicSalary = jTextBasicSalary.getText().trim();
+        String updatedRiceSubsidy = jTextRiceSubsidy.getText().trim();
+        String updatedPhoneAllowance = jTextPhoneAllowance.getText().trim();
+        String updatedClothingAllowance = jTextClothingAllowance.getText().trim();
+        String updatedGross = jTextGross.getText().trim();
+        String updatedHourlyRate = jTextHorulyRate.getText().trim();
+
+        // Update table values (keep current if field is empty)
+        model.setValueAt(updatedEmployeeID.isEmpty() ? currentEmployeeID : updatedEmployeeID, selectedRow, 0);
+        model.setValueAt(updatedLastName.isEmpty() ? currentLastName : updatedLastName, selectedRow, 1);
+        model.setValueAt(updatedFirstName.isEmpty() ? currentFirstName : updatedFirstName, selectedRow, 2);
+        model.setValueAt(updatedBirthday.isEmpty() ? currentBirthday : updatedBirthday, selectedRow, 3);
+        model.setValueAt(updatedAddress.isEmpty() ? currentAddress : updatedAddress, selectedRow, 4);
+        model.setValueAt(updatedPhoneNumber.isEmpty() ? currentPhoneNumber : updatedPhoneNumber, selectedRow, 5);
+        model.setValueAt(updatedSSS.isEmpty() ? currentSSS : updatedSSS, selectedRow, 6);
+        model.setValueAt(updatedPhilhealth.isEmpty() ? currentPhilhealth : updatedPhilhealth, selectedRow, 7);
+        model.setValueAt(updatedTIN.isEmpty() ? currentTIN : updatedTIN, selectedRow, 8);
+        model.setValueAt(updatedPagibig.isEmpty() ? currentPagibig : updatedPagibig, selectedRow, 9);
+        model.setValueAt(updatedStatus.isEmpty() ? currentStatus : updatedStatus, selectedRow, 10);
+        model.setValueAt(updatedPosition.isEmpty() ? currentPosition : updatedPosition, selectedRow, 11);
+        model.setValueAt(updatedImmediateSupervisor.isEmpty() ? currentImmediateSupervisor : updatedImmediateSupervisor, selectedRow, 12);
+        model.setValueAt(updatedBasicSalary.isEmpty() ? currentBasicSalary : updatedBasicSalary, selectedRow, 13);
+        model.setValueAt(updatedRiceSubsidy.isEmpty() ? currentRiceSubsidy : updatedRiceSubsidy, selectedRow, 14);
+        model.setValueAt(updatedPhoneAllowance.isEmpty() ? currentPhoneAllowance : updatedPhoneAllowance, selectedRow, 15);
+        model.setValueAt(updatedClothingAllowance.isEmpty() ? currentClothingAllowance : updatedClothingAllowance, selectedRow, 16);
+        model.setValueAt(updatedGross.isEmpty() ? currentGross : updatedGross, selectedRow, 17);
+        model.setValueAt(updatedHourlyRate.isEmpty() ? currentHourlyRate : updatedHourlyRate, selectedRow, 18);
+
+        // Save updated table to CSV
+        saveTableToCSV("src/automatedpayrollsystem/MotorPH_Employee_Database.csv");
+
+        // Reload table from CSV to reflect changes
+        loadCSVData();
+
+        JOptionPane.showMessageDialog(this, "Employee information updated successfully.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a row to update.");
+    }
     }//GEN-LAST:event_jUpdateButtonActionPerformed
 
     private void jDeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteButtonActionPerformed
-    int row = jTable1.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Select a row to delete.");
-            return;
+    DefaultTableModel model = (DefaultTableModel) jEmployeeTable2.getModel();
+        int selectedRow = jEmployeeTable2.getSelectedRow();
+
+    if (selectedRow != -1) {
+        //  Store the row data BEFORE deleting (for Undo)
+        lastDeletedRow = new String[model.getColumnCount()];
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            lastDeletedRow[i] = model.getValueAt(selectedRow, i).toString();
         }
+        lastDeletedRowIndex = selectedRow;
 
-        List<String[]> employees = getAllEmployees();
-        String idToDelete = jTable1.getValueAt(row, 0).toString();
-        Iterator<String[]> iterator = employees.iterator();
+        // Remove the row
+        model.removeRow(selectedRow);
 
-        while (iterator.hasNext()) {
-            String[] emp = iterator.next();
-            if (emp[0].equals(idToDelete)) {
-                lastDeletedEmployee = emp;
-                iterator.remove();
-                break;
-            }
-        }
-
-        saveAllEmployees(employees);
-        JOptionPane.showMessageDialog(this, "Deleted.");
-        loadEmployees();
+        //  Save and reload the table
+        saveTableToCSV("src/automatedpayrollsystem/MotorPH_Employee_Database.csv");
+        loadCSVData();
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a row to delete.");
+    }
     }//GEN-LAST:event_jDeleteButtonActionPerformed
 
     private void BackButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButton1ActionPerformed
-  this.dispose(); // Close the current form
-        String username = null;
+    String username = null;
     new HRDashboard(username).setVisible(true); // Open the previous/main form
+    this.dispose(); // Close the current form
     }//GEN-LAST:event_BackButton1ActionPerformed
+
+    private void jTextPhoneNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextPhoneNumberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextPhoneNumberActionPerformed
+
+    private void jTextStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextStatusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextStatusActionPerformed
+
+    private void jTextPhoneAllowanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextPhoneAllowanceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextPhoneAllowanceActionPerformed
+
+    private void jTextHorulyRateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextHorulyRateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextHorulyRateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -328,21 +610,47 @@ new ManageEmployeeForm().setVisible(true);
     private javax.swing.JButton AddButton;
     private javax.swing.JButton BackButton1;
     private javax.swing.JButton UmdoDeleteButton;
+    private javax.swing.JLabel jAddress;
+    private javax.swing.JLabel jBasicSalary;
+    private javax.swing.JLabel jBirthday;
+    private javax.swing.JLabel jClothingAllowance;
     private javax.swing.JButton jDeleteButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jEmployeeID;
+    private javax.swing.JTable jEmployeeTable2;
+    private javax.swing.JLabel jFirstName;
+    private javax.swing.JLabel jImmediateSupervisor;
+    private javax.swing.JLabel jLLastName;
+    private javax.swing.JLabel jPagibig;
+    private javax.swing.JLabel jPhilhealth;
+    private javax.swing.JLabel jPhoneAllowance;
+    private javax.swing.JLabel jPhoneAllowance1;
+    private javax.swing.JLabel jPhoneNumber;
+    private javax.swing.JLabel jPosition;
+    private javax.swing.JLabel jRiceSubsidy;
+    private javax.swing.JLabel jRiceSubsidy1;
+    private javax.swing.JLabel jSSS;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextDepartment;
-    private javax.swing.JTextField jTextEmail;
+    private javax.swing.JLabel jStatus;
+    private javax.swing.JLabel jTIN;
+    private javax.swing.JTextField jTextAddress;
+    private javax.swing.JTextField jTextBasicSalary;
+    private javax.swing.JTextField jTextBirthday;
+    private javax.swing.JTextField jTextClothingAllowance;
     private javax.swing.JTextField jTextEmployeeID;
-    private javax.swing.JTextField jTextName;
+    private javax.swing.JTextField jTextFirstName;
+    private javax.swing.JTextField jTextGross;
+    private javax.swing.JTextField jTextHorulyRate;
+    private javax.swing.JTextField jTextImmediateSupervisor;
+    private javax.swing.JTextField jTextLastName;
+    private javax.swing.JTextField jTextPagibig;
+    private javax.swing.JTextField jTextPhilhealth;
+    private javax.swing.JTextField jTextPhoneAllowance;
+    private javax.swing.JTextField jTextPhoneNumber;
     private javax.swing.JTextField jTextPosition;
-    private javax.swing.JTextField jTextSalary;
+    private javax.swing.JTextField jTextRiceSubsidy;
+    private javax.swing.JTextField jTextSSS;
+    private javax.swing.JTextField jTextStatus;
+    private javax.swing.JTextField jTextTIN;
     private javax.swing.JButton jUpdateButton;
     // End of variables declaration//GEN-END:variables
 }

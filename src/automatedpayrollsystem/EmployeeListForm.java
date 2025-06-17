@@ -89,7 +89,7 @@ public class EmployeeListForm extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1350, 650));
+        setPreferredSize(new java.awt.Dimension(1320, 650));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButton1.setBackground(new java.awt.Color(0, 172, 238));
@@ -100,7 +100,7 @@ public class EmployeeListForm extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 550, 121, -1));
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 560, 121, -1));
 
         employeeTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
