@@ -26,16 +26,16 @@ import java.io.File;
  *
  * @author Jomax
  */
-public class LoginForm extends javax.swing.JFrame {
+public class LoginController extends javax.swing.JFrame {
 
     /**
-     * Creates new form LoginForm
+     * Creates new form LoginController
      */
     
         private char defaultEchoChar;
         private boolean passwordVisible = false;
     
-    public LoginForm() {
+    public LoginController() {
         initComponents();
         setLocationRelativeTo(null); // This centers the window
     // Check if CSV file loaded properly
@@ -68,9 +68,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         JUsernameTextField = new javax.swing.JTextField();
-        rolecombobox = new javax.swing.JComboBox<>();
         jCancelButton = new javax.swing.JButton();
         jLoginButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
@@ -89,27 +87,18 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel3.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
         jLabel3.setText("Username:");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 160, 99, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 99, -1));
 
         jLabel4.setFont(new java.awt.Font("Impact", 0, 20)); // NOI18N
         jLabel4.setText("Password:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 200, 99, -1));
-
-        jLabel5.setFont(new java.awt.Font("Impact", 0, 20)); // NOI18N
-        jLabel5.setText("Select Position:");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 240, 140, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 200, 99, -1));
 
         JUsernameTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 JUsernameTextFieldActionPerformed(evt);
             }
         });
-        getContentPane().add(JUsernameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, 180, -1));
-
-        rolecombobox.setBackground(new java.awt.Color(0, 172, 238));
-        rolecombobox.setFont(new java.awt.Font("Impact", 0, 16)); // NOI18N
-        rolecombobox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HR Personnel", "Team Leader", "Payroll Manager", "Accounting Head", "Regular Employee" }));
-        getContentPane().add(rolecombobox, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 180, -1));
+        getContentPane().add(JUsernameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 160, 180, -1));
 
         jCancelButton.setBackground(new java.awt.Color(0, 172, 238));
         jCancelButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -119,7 +108,7 @@ public class LoginForm extends javax.swing.JFrame {
                 jCancelButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jCancelButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 290, 122, -1));
+        getContentPane().add(jCancelButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 250, 122, -1));
 
         jLoginButton.setBackground(new java.awt.Color(0, 172, 238));
         jLoginButton.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
@@ -129,7 +118,7 @@ public class LoginForm extends javax.swing.JFrame {
                 jLoginButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jLoginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 290, 110, -1));
+        getContentPane().add(jLoginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 250, 110, -1));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 204));
         jPanel1.setPreferredSize(new java.awt.Dimension(800, 100));
@@ -137,7 +126,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Impact", 0, 30)); // NOI18N
         jLabel1.setText("Automated Payroll System");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 30, 340, -1));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 30, 340, -1));
 
         jLabel2.setFont(new java.awt.Font("Impact", 0, 21)); // NOI18N
         jLabel2.setText("By: Jomax");
@@ -147,7 +136,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel6.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
         jLabel6.setText("Please enter your username and password\t");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, 330, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 120, 330, -1));
 
         ForgotPasswordorUsernameMouseClick.setFont(new java.awt.Font("Impact", 0, 18)); // NOI18N
         ForgotPasswordorUsernameMouseClick.setText("Forgot Password or Username");
@@ -156,8 +145,8 @@ public class LoginForm extends javax.swing.JFrame {
                 ForgotPasswordorUsernameMouseClickMouseClicked(evt);
             }
         });
-        getContentPane().add(ForgotPasswordorUsernameMouseClick, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, -1, -1));
-        getContentPane().add(jPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 200, 180, -1));
+        getContentPane().add(ForgotPasswordorUsernameMouseClick, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 300, -1, -1));
+        getContentPane().add(jPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 200, 180, -1));
 
         jShowPasswordButton.setFont(new java.awt.Font("Impact", 0, 14)); // NOI18N
         jShowPasswordButton.setText("Show Password");
@@ -166,7 +155,7 @@ public class LoginForm extends javax.swing.JFrame {
                 jShowPasswordButtonActionPerformed(evt);
             }
         });
-        getContentPane().add(jShowPasswordButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 200, -1, -1));
+        getContentPane().add(jShowPasswordButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 200, -1, -1));
         setJMenuBar(Login);
 
         pack();
@@ -226,7 +215,7 @@ try {
     if (found) {
         JOptionPane.showMessageDialog(this, "✅ Login successful!");
 
-        // Open the HR Dashboard window and close the LoginForm
+        // Open the HR Dashboard window and close the LoginController
         HRDashboard dashboard = new HRDashboard(inputUsername);
         dashboard.setVisible(true);
         this.dispose();
@@ -268,20 +257,21 @@ if (!passwordVisible) {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginForm().setVisible(true);
+                new LoginController().setVisible(true);
             }
         });
     }
@@ -295,12 +285,10 @@ if (!passwordVisible) {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JButton jLoginButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField;
     private javax.swing.JButton jShowPasswordButton;
-    private javax.swing.JComboBox<String> rolecombobox;
     // End of variables declaration//GEN-END:variables
 }

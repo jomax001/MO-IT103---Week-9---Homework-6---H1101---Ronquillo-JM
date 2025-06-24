@@ -15,7 +15,7 @@ public class AutomatedPayrollSystem {
      */
     public static void main(String[] args) {
     java.awt.EventQueue.invokeLater(() -> {
-        new LoginForm().setVisible(true);
+        new LoginController().setVisible(true);
     });
     }
 }

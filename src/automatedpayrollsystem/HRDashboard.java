@@ -5,7 +5,7 @@
 package automatedpayrollsystem;
 
 import automatedpayrollsystem.EmployeeListForm;
-import automatedpayrollsystem.LoginForm;
+import automatedpayrollsystem.LoginController;
 import automatedpayrollsystem.ManageEmployeeForm;
 import javax.swing.JOptionPane;
 
@@ -137,7 +137,7 @@ public class HRDashboard extends javax.swing.JFrame {
 int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to logout?", "Logout", JOptionPane.YES_NO_OPTION);
 if (confirm == JOptionPane.YES_OPTION) {
     this.dispose();
-    new LoginForm().setVisible(true); // bumalik sa login form
+    new LoginController().setVisible(true); // bumalik sa login form
 }
 
     }//GEN-LAST:event_LogoutButtonActionPerformed
